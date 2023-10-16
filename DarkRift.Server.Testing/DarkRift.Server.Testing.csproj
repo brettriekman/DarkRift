@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DarkRift.Plugins\DarkRift.Plugins.csproj" />
     <ProjectReference Include="..\DarkRift\DarkRift.csproj" />
     <ProjectReference Include="..\DarkRift.Server\DarkRift.Server.csproj" />
   </ItemGroup>

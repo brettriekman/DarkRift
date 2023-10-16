@@ -7,7 +7,6 @@
 using System;
 using DarkRift.Dispatching;
 using System.Threading;
-using DarkRift.Server.Plugins.Chat;
 using System.Collections.Specialized;
 using DarkRift.Server.Metrics;
 
@@ -77,7 +76,6 @@ namespace DarkRift.Server
         /// <summary>
         ///     Helper plugin for filtering bad words out of text.
         /// </summary>
-        public IBadWordFilter BadWordFilter => PluginManager.GetPluginByType<BadWordFilter>();
 
         /// <summary>
         ///     The server registry connector manager.
@@ -198,47 +196,6 @@ namespace DarkRift.Server
             //Load plugin factory so we can load log writers
             pluginFactory = new PluginFactory(logManager.GetLoggerFor(nameof(PluginFactory)));
             pluginFactory.AddFromSettings(spawnData.PluginSearch);
-            pluginFactory.AddTypes(
-                new Type[]
-                {
-                    typeof(Plugins.LogWriters.ConsoleWriter),
-                    typeof(Plugins.LogWriters.DebugWriter),
-                    typeof(Plugins.LogWriters.FileWriter)
-                }
-            );
-            pluginFactory.AddTypes(
-                new Type[]
-                {
-                    typeof(Plugins.Commands.HelpCommand),
-                    typeof(Plugins.Commands.PluginController),
-                    typeof(Plugins.Commands.Sniffer),
-                    typeof(Plugins.Commands.DemoCommand),
-                    typeof(Plugins.Commands.MessageCommand),
-                    typeof(Plugins.Commands.MockCommand),
-                    typeof(Plugins.Commands.DebugCommand),
-                    typeof(Plugins.Commands.ClientCommand),
-                    typeof(Plugins.Commands.ClearCommand)
-                }
-            );
-            pluginFactory.AddTypes(
-                new Type[]
-                {
-                    typeof(Plugins.Performance.ObjectCacheMonitor)
-                }
-            );
-            pluginFactory.AddTypes(
-                new Type[]
-                {
-                    typeof(Plugins.HealthCheck.HttpHealthCheck)
-                }
-            );
-            pluginFactory.AddTypes(
-                new Type[]
-                {
-                    typeof(Plugins.Chat.BadWordFilter),
-                    typeof(Plugins.Metrics.Prometheus.PrometheusEndpoint)
-                }
-            );
 
             //Fix network listeners in
             pluginFactory.AddTypes(

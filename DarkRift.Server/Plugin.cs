@@ -5,7 +5,6 @@
  */
 
 using DarkRift.Dispatching;
-using DarkRift.Server.Plugins.Chat;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -49,17 +48,12 @@ namespace DarkRift.Server
         ///     The location of this plugins resource store.
         /// </summary>
         /// <remarks>
-        ///     The resource directory can be used to store any external resources your plugin requires such as web 
+        ///     The resource directory can be used to store any external resources your plugin requires such as web
         ///     files etc. It will be removed when uninstalling your plugin so you should not store any files elsewhere.
-        ///     
+        ///
         ///     This location may not exist if called from the constructor, use the <see cref="ExtendedPluginBase.Loaded(LoadedEventArgs)"/> event instead.
         /// </remarks>
         protected string ResourceDirectory { get; }
-
-        /// <summary>
-        ///     Helper plugin for filtering bad words out of text.
-        /// </summary>
-        public IBadWordFilter BadWordFilter => PluginManager.GetPluginByType<BadWordFilter>();
 
         /// <summary>
         ///     Creates a new plugin using the given plugin load data.

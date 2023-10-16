@@ -4,13 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Plugins.Matchmaking;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DarkRift.Plugins.Matchmaking;
 
 namespace DarkRift.Server.Plugins.Rooms.Tests.Plugins.Matchmaking
 {
@@ -344,7 +340,7 @@ namespace DarkRift.Server.Plugins.Rooms.Tests.Plugins.Matchmaking
 
             Assert.AreEqual(0.5f, builder.Ranking);
         }
-        
+
         [TestMethod]
         public void TestFail()
         {
@@ -352,7 +348,7 @@ namespace DarkRift.Server.Plugins.Rooms.Tests.Plugins.Matchmaking
 
             //Fail
             builder.Fail();
-            
+
             Assert.AreEqual(true, builder.Failed);
 
             //Add ranking as should always return 0

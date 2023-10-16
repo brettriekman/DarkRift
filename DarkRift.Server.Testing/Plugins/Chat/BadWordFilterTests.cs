@@ -8,9 +8,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Text.RegularExpressions;
-using DarkRift.Server.Plugins.Chat;
 using System.Collections.Specialized;
-using DarkRift.Server;
 using System.IO;
 
 namespace DarkRift.Server.Plugins.Chat.Testing

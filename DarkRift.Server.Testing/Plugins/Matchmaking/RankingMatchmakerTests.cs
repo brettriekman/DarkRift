@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
+using DarkRift.Plugins.Matchmaking;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -76,7 +77,7 @@ namespace DarkRift.Server.Plugins.Matchmaking.Tests
 
             foreach (TestEntity entity in entities)
                 matchmaker.Object.Enqueue(entity, null);
-            
+
             bool invoked = false;
             matchmaker.Object.GroupFormed += (object sender, GroupFormedEventArgs<TestEntity> args) =>
             {

@@ -27,7 +27,7 @@ namespace DarkRift.Server
         /// <summary>
         ///     Should this plugin be hidden from output?
         /// </summary>
-        internal virtual bool Hidden { get; }
+        public virtual bool Hidden { get; }
 
         /// <summary>
         ///     The database manager for the server.
@@ -39,12 +39,12 @@ namespace DarkRift.Server
         ///     The dispatcher for this server.
         /// </summary>
         public IDispatcher Dispatcher { get; }
-        
+
         /// <summary>
         ///     Information about this server.
         /// </summary>
         public DarkRiftInfo ServerInfo { get; }
-        
+
         /// <summary>
         ///     The thread helper for the server.
         /// </summary>
@@ -120,7 +120,7 @@ namespace DarkRift.Server
             {
                 if (disposing)
                 {
-                    
+
                 }
 
                 disposedValue = true;
