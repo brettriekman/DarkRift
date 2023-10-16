@@ -8,7 +8,6 @@ using System;
 using DarkRift.Dispatching;
 using System.Threading;
 using System.Collections.Specialized;
-using DarkRift.Server.Metrics;
 
 namespace DarkRift.Server
 {
@@ -21,11 +20,6 @@ namespace DarkRift.Server
         ///     The manager for logs.
         /// </summary>
         public ILogManager LogManager => logManager;
-
-        /// <summary>
-        ///     The manager for metrics.
-        /// </summary>
-        public IMetricsManager MetricsManager => metricsManager;
 
         /// <summary>
         ///     The client manager handling all clients on this server.
@@ -133,11 +127,6 @@ namespace DarkRift.Server
         private readonly LogManager logManager;
 
         /// <summary>
-        ///     The manager for metrics.
-        /// </summary>
-        private readonly MetricsManager metricsManager;
-
-        /// <summary>
         ///     The factory for plugins.
         /// </summary>
         private readonly PluginFactory pluginFactory;
@@ -223,14 +212,11 @@ namespace DarkRift.Server
                 logger.Trace("Cache already initialized, cannot update settings. The server will continue using the pre-existing cache.");
 
             //Load later stage things
-            metricsManager = new MetricsManager(this, spawnData.Metrics);
-            metricsManager.LoadWriters(spawnData.Metrics, pluginFactory, logManager);
-            internalServerRegistryConnectorManager = new ServerRegistryConnectorManager(this, pluginFactory, logManager, metricsManager);
+            internalServerRegistryConnectorManager = new ServerRegistryConnectorManager(this, pluginFactory, logManager);
 
             networkListenerManager = new NetworkListenerManager(
                 this,
                 logManager,
-                metricsManager,
                 DataManager,
                 pluginFactory
             );
@@ -243,8 +229,7 @@ namespace DarkRift.Server
                 ThreadHelper,
                 internalServerRegistryConnectorManager,
                 logManager,
-                logManager.GetLoggerFor(nameof(RemoteServerManager)),
-                metricsManager
+                logManager.GetLoggerFor(nameof(RemoteServerManager))
             );
 
             InternalClientManager = new ClientManager(
@@ -252,9 +237,7 @@ namespace DarkRift.Server
                 networkListenerManager,
                 ThreadHelper,
                 logManager.GetLoggerFor(nameof(ClientManager)),
-                logManager.GetLoggerFor(nameof(Client)),
-                metricsManager.GetMetricsCollectorFor(nameof(ClientManager)),
-                metricsManager.GetPerMessageMetricsCollectorFor(nameof(Client))
+                logManager.GetLoggerFor(nameof(Client))
             );
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -266,7 +249,6 @@ namespace DarkRift.Server
                 this,
                 DataManager,
                 logManager,
-                metricsManager,
                 pluginFactory,
                 logManager.GetLoggerFor(nameof(PluginManager))
             );
@@ -446,8 +428,6 @@ namespace DarkRift.Server
                 internalServerRegistryConnectorManager.Dispose();
 
                 InternalRemoteServerManager.Dispose();
-
-                metricsManager.Dispose();
 
                 DataManager.Dispose();
 

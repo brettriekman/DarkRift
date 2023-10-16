@@ -4,12 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace DarkRift.Server
 {
@@ -30,16 +26,6 @@ namespace DarkRift.Server
         public ushort Port { get; protected set; }
 
         /// <summary>
-        /// The server's metrics manager.
-        /// </summary>
-        protected IMetricsManager MetricsManager { get; }
-
-        /// <summary>
-        ///     Metrics collector for the plugin.
-        /// </summary>
-        protected MetricsCollector MetricsCollector { get; }
-
-        /// <summary>
         ///     Event fired when a new connection is registered.
         /// </summary>
         // TODO improve event handler type?
@@ -53,8 +39,6 @@ namespace DarkRift.Server
         {
             Address = pluginLoadData.Address;
             Port = pluginLoadData.Port;
-            MetricsManager = pluginLoadData.MetricsManager;
-            MetricsCollector = pluginLoadData.MetricsCollector;
         }
 
         /// <summary>

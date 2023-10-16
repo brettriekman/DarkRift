@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System.Collections.Specialized;
 
 namespace DarkRift.Server
@@ -24,8 +23,8 @@ namespace DarkRift.Server
         /// </summary>
         public IRemoteServerManager RemoteServerManager { get; set; }
 
-        internal ServerRegistryConnectorLoadData(string name, DarkRiftServer server, NameValueCollection settings, Logger logger, MetricsCollector metricsCollector)
-            : base(name, server, settings, logger, metricsCollector)
+        internal ServerRegistryConnectorLoadData(string name, DarkRiftServer server, NameValueCollection settings, Logger logger)
+            : base(name, server, settings, logger)
         {
             this.ServerRegistryConnectorManager = server.ServerRegistryConnectorManager;
             this.RemoteServerManager = server.RemoteServerManager;

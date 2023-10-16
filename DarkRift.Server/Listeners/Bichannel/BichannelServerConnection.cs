@@ -4,13 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace DarkRift.Server.Plugins.Listeners.Bichannel
 {
@@ -38,7 +35,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         ///     The end point of the remote client on UDP.
         /// </summary>
         public IPEndPoint RemoteUdpEndPoint { get; }
-        
+
         /// <summary>
         ///     Whether Nagel's algorithm should be disabled or not.
         /// </summary>
@@ -70,27 +67,8 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         /// </summary>
         private readonly BichannelListenerBase networkListener;
 
-        /// <summary>
-        /// Counter for the number of bytes sent via TCP by the listener.
-        /// </summary>
-        private readonly ICounterMetric bytesSentCounterTcp;
 
-        /// <summary>
-        /// Counter for the number of bytes sent via UDP by the listener.
-        /// </summary>
-        private readonly ICounterMetric bytesSentCounterUdp;
-
-        /// <summary>
-        /// Counter for the number of bytes received via TCP by the listener.
-        /// </summary>
-        private readonly ICounterMetric bytesReceivedCounterTcp;
-
-        /// <summary>
-        /// Counter for the number of bytes received via UDP by the listener.
-        /// </summary>
-        private readonly ICounterMetric bytesReceivedCounterUdp;
-
-        internal BichannelServerConnection(Socket tcpSocket, BichannelListenerBase networkListener, IPEndPoint udpEndPoint, long authToken, MetricsCollector metricsCollector)
+        internal BichannelServerConnection(Socket tcpSocket, BichannelListenerBase networkListener, IPEndPoint udpEndPoint, long authToken)
         {
             this.tcpSocket = tcpSocket;
             this.networkListener = networkListener;
@@ -100,15 +78,8 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
 
             //Mark connected to allow sending
             CanSend = true;
-
-            TaggedMetricBuilder<ICounterMetric> bytesSentCounter = metricsCollector.Counter("bytes_sent", "The number of bytes sent to clients by the listener.", "protocol");
-            TaggedMetricBuilder<ICounterMetric> bytesReceivedCounter = metricsCollector.Counter("bytes_received", "The number of bytes received from clients by the listener.", "protocol");
-            bytesSentCounterTcp = bytesSentCounter.WithTags("tcp");
-            bytesSentCounterUdp = bytesSentCounter.WithTags("udp");
-            bytesReceivedCounterTcp = bytesReceivedCounter.WithTags("tcp");
-            bytesReceivedCounterUdp = bytesReceivedCounter.WithTags("udp");
         }
-        
+
         /// <summary>
         ///     Begins listening for data.
         /// </summary>
@@ -183,7 +154,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                 message.Dispose();
                 return false;
             }
-            
+
             return networkListener.SendUdpBuffer(RemoteUdpEndPoint, message, UdpSendCompleted);
         }
 
@@ -249,7 +220,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                 int bodyLength = ProcessHeader(args);
                 if (bodyLength >= networkListener.MaxTcpBodyLength)
                 {
-                    Strike("TCP body length was above allowed limits.", 10);
                     return;
                 }
 
@@ -279,7 +249,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
 
                     UpdateBufferPointers(args);
                 }
-                
+
                 MessageBuffer bodyBuffer = ProcessBody(args);
 
                 if (PreserveTcpOrdering)
@@ -439,11 +409,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         private void ProcessMessage(MessageBuffer buffer)
         {
             HandleMessageReceived(buffer, SendMode.Reliable);
-
-            int bytesReceived = buffer.Count;
             buffer.Dispose();
-
-            bytesReceivedCounterTcp.Increment(bytesReceived + 4);
         }
 
         /// <summary>
@@ -550,8 +516,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         internal void HandleUdpMessage(MessageBuffer buffer)
         {
             HandleMessageReceived(buffer, SendMode.Unreliable);
-
-            bytesReceivedCounterUdp.Increment(buffer.Count);
         }
 
         /// <summary>
@@ -563,18 +527,15 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         {
             if (e.SocketError != SocketError.Success)
                 UnregisterAndDisconnect(e.SocketError);
-            
+
             e.Completed -= TcpSendCompleted;
 
             MessageBuffer messageBuffer = (MessageBuffer)e.UserToken;
-            int bytesSent = messageBuffer.Count;
-
             //Always dispose buffer when completed!
             messageBuffer.Dispose();
 
             ObjectCache.ReturnSocketAsyncEventArgs(e);
 
-            bytesSentCounterTcp.Increment(bytesSent + 4);
         }
 
         /// <summary>
@@ -586,8 +547,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         {
             if (e != SocketError.Success)
                 UnregisterAndDisconnect(e);
-
-            bytesSentCounterUdp.Increment(bytesSent);
         }
 
         /// <summary>
@@ -606,7 +565,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                 HandleDisconnection(error);
             }
         }
-        
+
         /// <inheritdoc/>
         public override IPEndPoint GetRemoteEndPoint(string name)
         {
@@ -636,7 +595,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                 disposedValue = true;
             }
         }
-        
+
 #endregion
     }
 }

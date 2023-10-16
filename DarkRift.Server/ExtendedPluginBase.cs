@@ -4,11 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace DarkRift.Server
 {
@@ -21,8 +17,8 @@ namespace DarkRift.Server
         ///     Is this plugin able to handle multithreaded events?
         /// </summary>
         /// <remarks>
-        ///     Enabling this option allows DarkRift to send messages to your plugin from multiple threads simultaneously, 
-        ///     greatly increasing performance. Do not enable this unless you are confident that you understand 
+        ///     Enabling this option allows DarkRift to send messages to your plugin from multiple threads simultaneously,
+        ///     greatly increasing performance. Do not enable this unless you are confident that you understand
         ///     multithreading else you will find yourself with a variety of unfriendly problems to fix!
         /// </remarks>
         public abstract bool ThreadSafe { get; }
@@ -31,20 +27,10 @@ namespace DarkRift.Server
         ///     The commands the plugin has.
         /// </summary>
         /// <remarks>
-        ///     This is an array of commands that can be executed by this plugin and will be searched through when the 
+        ///     This is an array of commands that can be executed by this plugin and will be searched through when the
         ///     command is executed. Changes to this array will be reflected instantly by the command system.
         /// </remarks>
         public virtual Command[] Commands => new Command[0];
-
-        /// <summary>
-        /// The server's metrics manager.
-        /// </summary>
-        public IMetricsManager MetricsManager { get; }
-
-        /// <summary>
-        ///     Metrics collector for the plugin.
-        /// </summary>
-        protected MetricsCollector MetricsCollector { get; }
 
         /// <summary>
         ///     The handler for writing events.
@@ -62,8 +48,6 @@ namespace DarkRift.Server
             writeEventHandler = pluginLoadData.WriteEventHandler;
 #pragma warning restore CS0618
 
-            MetricsManager = pluginLoadData.MetricsManager;
-            MetricsCollector= pluginLoadData.MetricsCollector;
         }
 
         /// <summary>

@@ -5,15 +5,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-
-using System.Data.Common;
 using System.Collections.Specialized;
-using System.Threading;
-using DarkRift.Server.Metrics;
 
 namespace DarkRift.Server
 {
@@ -38,11 +31,6 @@ namespace DarkRift.Server
         private readonly LogManager logManager;
 
         /// <summary>
-        ///     The server's log manager.
-        /// </summary>
-        private readonly MetricsManager metricsManager;
-
-        /// <summary>
         ///     The server's plugin factory.
         /// </summary>
         private readonly PluginFactory pluginFactory;
@@ -55,14 +43,12 @@ namespace DarkRift.Server
         /// <param name="logManager">The server's log manager.</param>
         /// <param name="pluginFactory">The server's plugin factory.</param>
         /// <param name="logger">The logger for this manager.</param>
-        /// <param name="metricsManager">The server's metrics manager.</param>
-        internal PluginManager(DarkRiftServer server, DataManager dataManager, LogManager logManager, MetricsManager metricsManager, PluginFactory pluginFactory, Logger logger)
+        internal PluginManager(DarkRiftServer server, DataManager dataManager, LogManager logManager, PluginFactory pluginFactory, Logger logger)
             : base (server, dataManager, pluginFactory, logger)
         {
             this.server = server;
             this.dataManager = dataManager;
             this.logManager = logManager;
-            this.metricsManager = metricsManager;
             this.pluginFactory = pluginFactory;
         }
 
@@ -73,17 +59,16 @@ namespace DarkRift.Server
         internal void LoadPlugins(ServerSpawnData.PluginsSettings settings)
         {
             Type[] types = pluginFactory.GetAllSubtypes(typeof(Plugin));
-            
+
             foreach (Type type in types)
             {
                 var s = settings.Plugins.FirstOrDefault(p => p.Type == type.Name);
 
                 PluginLoadData loadData = new PluginLoadData(
-                    type.Name, 
-                    server, 
+                    type.Name,
+                    server,
                     s?.Settings ?? new NameValueCollection(),
                     logManager.GetLoggerFor(type.Name),
-                    metricsManager.GetMetricsCollectorFor(type.Name),
                     dataManager.GetResourceDirectory(type.Name)
                 );
 

@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using DarkRift.Server.Metrics;
 
 namespace DarkRift.Server
 {
@@ -33,7 +32,6 @@ namespace DarkRift.Server
         /// <summary>
         /// The metrics collector to pass to created remote servers.
         /// </summary>
-        private readonly MetricsCollector remoteServerMetricsCollector;
 
         /// <summary>
         ///     Creates a new downstream connected server group
@@ -43,21 +41,18 @@ namespace DarkRift.Server
         /// <param name="threadHelper">The server's thread helper.</param>
         /// <param name="logger">The logger to use.</param>
         /// <param name="remoteServerLogger">The logger to pass to created remote servers.</param>
-        /// <param name="metricsCollector">The metrics collector to use.</param>
-        /// <param name="remoteServerMetricsCollector">The metrics collector to pass to created remote servers.</param>
-        internal DownstreamServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, Logger logger, Logger remoteServerLogger, MetricsCollector metricsCollector, MetricsCollector remoteServerMetricsCollector)
-            : base(name, visibility, threadHelper, logger, metricsCollector)
+        internal DownstreamServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, Logger logger, Logger remoteServerLogger)
+            : base(name, visibility, threadHelper, logger)
         {
             this.threadHelper = threadHelper;
             this.logger = logger;
             this.remoteServerLogger = remoteServerLogger;
-            this.remoteServerMetricsCollector = remoteServerMetricsCollector;
         }
 
         /// <inheritdoc />
         public override void HandleServerJoin(ushort id, string host, ushort port, IDictionary<string, string> properties)
         {
-            DownstreamRemoteServer remoteServer = new DownstreamRemoteServer(id, host, port, this, threadHelper, remoteServerLogger, remoteServerMetricsCollector);
+            DownstreamRemoteServer remoteServer = new DownstreamRemoteServer(id, host, port, this, threadHelper, remoteServerLogger);
 
             AddServer(remoteServer);
 

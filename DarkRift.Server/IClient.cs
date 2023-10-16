@@ -17,10 +17,6 @@ namespace DarkRift.Server
     /// </summary>
     public interface IClient : IMessageSinkSource
     {
-        /// <summary>
-        ///     Called when the client is given a strike for illegal behaviour.
-        /// </summary>
-        event EventHandler<StrikeEventArgs> StrikeOccured;
 
         /// <summary>
         ///     The ID of the client.
@@ -51,18 +47,6 @@ namespace DarkRift.Server
         ConnectionState ConnectionState { get; }
 
         /// <summary>
-        ///     The number of illegal behaviours this client has made.
-        /// </summary>
-        /// <remarks>
-        ///     <legacyBold>Setter only available in Pro.</legacyBold>
-        /// </remarks>
-        byte Strikes
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         ///     The time this client connected to the server.
         /// </summary>
         DateTime ConnectionTime { get; }
@@ -86,7 +70,7 @@ namespace DarkRift.Server
         ///     The collection of end points this client is connected to.
         /// </summary>
         IEnumerable<IPEndPoint> RemoteEndPoints { get; }
-        
+
         /// <summary>
         ///     The round trip time helper for this client.
         /// </summary>
@@ -105,21 +89,5 @@ namespace DarkRift.Server
         /// <returns>The end point.</returns>
         IPEndPoint GetRemoteEndPoint(string name);
 
-        #region Strikes
-
-        /// <summary>
-        ///     Strikes this client.
-        /// </summary>
-        /// <param name="message">A message describing the reason for the strike.</param>
-        void Strike(string message = null);
-
-        /// <summary>
-        ///     Strikes this client.
-        /// </summary>
-        /// <param name="message">A message describing the reason for the strike.</param>
-        /// <param name="weight">The number of strikes this accounts for.</param>
-        void Strike(string message = null, int weight = 1);
-
-        #endregion
     }
 }

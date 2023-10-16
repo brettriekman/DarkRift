@@ -26,4 +26,8 @@
     <ProjectReference Include="..\DarkRift.Client\DarkRift.Client.csproj" />
     <ProjectReference Include="..\DarkRift\DarkRift.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Metrics\" />
+  </ItemGroup>
 </Project>

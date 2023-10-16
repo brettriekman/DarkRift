@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Specialized;
 
@@ -33,7 +32,6 @@ namespace DarkRift.Server
         /// <summary>
         /// The server's metrics manager.
         /// </summary>
-        private readonly MetricsManager metricsManager;
 
         /// <inheritdoc/>
         public ServerRegistryConnector ServerRegistryConnector { get; set; }
@@ -44,13 +42,11 @@ namespace DarkRift.Server
         /// <param name="server">The server that owns this manager.</param>
         /// <param name="pluginFactory">The server's plugin factory.</param>
         /// <param name="logManager">The server's log manager.</param>
-        /// <param name="metricsManager">The server's metrics manager.</param>
-        internal ServerRegistryConnectorManager(DarkRiftServer server, PluginFactory pluginFactory, LogManager logManager, MetricsManager metricsManager)
+        internal ServerRegistryConnectorManager(DarkRiftServer server, PluginFactory pluginFactory, LogManager logManager)
         {
             this.server = server;
             this.pluginFactory = pluginFactory;
             this.logManager = logManager;
-            this.metricsManager = metricsManager;
         }
 
         /// <summary>
@@ -65,8 +61,7 @@ namespace DarkRift.Server
                     settings.ServerRegistryConnector.Type,
                     server,
                     settings.ServerRegistryConnector.Settings ?? new NameValueCollection(),
-                    logManager.GetLoggerFor(settings.ServerRegistryConnector.Type),
-                    metricsManager.GetMetricsCollectorFor(settings.ServerRegistryConnector.Type)
+                    logManager.GetLoggerFor(settings.ServerRegistryConnector.Type)
                 );
 
                 ServerRegistryConnector = pluginFactory.Create<ServerRegistryConnector>(settings.ServerRegistryConnector.Type, loadData, null);

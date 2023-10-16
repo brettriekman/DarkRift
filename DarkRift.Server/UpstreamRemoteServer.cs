@@ -5,7 +5,6 @@
  */
 
 using DarkRift.Client;
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -75,45 +74,45 @@ namespace DarkRift.Server
         /// </summary>
         private readonly Logger logger;
 
-        /// <summary>
-        ///     Counter metric of the number of messages sent.
-        /// </summary>
-        private readonly ICounterMetric messagesSentCounter;
-
-        /// <summary>
-        ///     Counter metric of the number of messages received.
-        /// </summary>
-        private readonly ICounterMetric messagesReceivedCounter;
-
-        /// <summary>
-        ///     Histogram metric of the time taken to execute the <see cref="MessageReceived"/> event.
-        /// </summary>
-        private readonly IHistogramMetric messageReceivedEventTimeHistogram;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="MessageReceived"/> event.
-        /// </summary>
-        private readonly ICounterMetric messageReceivedEventFailuresCounter;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ServerConnected"/> event.
-        /// </summary>
-        private readonly IHistogramMetric serverConnectedEventTimeHistogram;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ServerDisconnected"/> event.
-        /// </summary>
-        private readonly IHistogramMetric serverDisconnectedEventTimeHistogram;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ServerConnected"/> event.
-        /// </summary>
-        private readonly ICounterMetric serverConnectedEventFailuresCounter;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ServerDisconnected"/> event.
-        /// </summary>
-        private readonly ICounterMetric serverDisconnectedEventFailuresCounter;
+        // /// <summary>
+        // ///     Counter metric of the number of messages sent.
+        // /// </summary>
+        // private readonly ICounterMetric messagesSentCounter;
+        //
+        // /// <summary>
+        // ///     Counter metric of the number of messages received.
+        // /// </summary>
+        // private readonly ICounterMetric messagesReceivedCounter;
+        //
+        // /// <summary>
+        // ///     Histogram metric of the time taken to execute the <see cref="MessageReceived"/> event.
+        // /// </summary>
+        // private readonly IHistogramMetric messageReceivedEventTimeHistogram;
+        //
+        // /// <summary>
+        // ///     Counter metric of failures executing the <see cref="MessageReceived"/> event.
+        // /// </summary>
+        // private readonly ICounterMetric messageReceivedEventFailuresCounter;
+        //
+        // /// <summary>
+        // ///     Histogram metric of time taken to execute the <see cref="ServerConnected"/> event.
+        // /// </summary>
+        // private readonly IHistogramMetric serverConnectedEventTimeHistogram;
+        //
+        // /// <summary>
+        // ///     Histogram metric of time taken to execute the <see cref="ServerDisconnected"/> event.
+        // /// </summary>
+        // private readonly IHistogramMetric serverDisconnectedEventTimeHistogram;
+        //
+        // /// <summary>
+        // ///     Counter metric of failures executing the <see cref="ServerConnected"/> event.
+        // /// </summary>
+        // private readonly ICounterMetric serverConnectedEventFailuresCounter;
+        //
+        // /// <summary>
+        // ///     Counter metric of failures executing the <see cref="ServerDisconnected"/> event.
+        // /// </summary>
+        // private readonly ICounterMetric serverDisconnectedEventFailuresCounter;
 
         /// <summary>
         ///     Creates a new remote server.
@@ -125,8 +124,8 @@ namespace DarkRift.Server
         /// <param name="group">The group the server belongs to.</param>
         /// <param name="threadHelper">The thread helper to use.</param>
         /// <param name="logger">The logger to use.</param>
-        /// <param name="metricsCollector">The metrics collector to use.</param>
-        internal UpstreamRemoteServer(RemoteServerManager remoteServerManager, ushort id, string host, ushort port, UpstreamServerGroup group, DarkRiftThreadHelper threadHelper, Logger logger, MetricsCollector metricsCollector)
+        // /// <param name="metricsCollector">The metrics collector to use.</param>
+        internal UpstreamRemoteServer(RemoteServerManager remoteServerManager, ushort id, string host, ushort port, UpstreamServerGroup group, DarkRiftThreadHelper threadHelper, Logger logger)
         {
             this.remoteServerManager = remoteServerManager;
             this.ID = id;
@@ -136,14 +135,14 @@ namespace DarkRift.Server
             this.threadHelper = threadHelper;
             this.logger = logger;
 
-            messagesSentCounter = metricsCollector.Counter("messages_sent", "The number of messages sent to remote servers.", "group").WithTags(group.Name);
-            messagesReceivedCounter = metricsCollector.Counter("messages_received", "The number of messages received from remote servers.", "group").WithTags(group.Name);
-            messageReceivedEventTimeHistogram = metricsCollector.Histogram("message_received_event_time", "The time taken to execute the MessageReceived event.", "group").WithTags(group.Name);
-            messageReceivedEventFailuresCounter = metricsCollector.Counter("message_received_event_failures", "The number of failures executing the MessageReceived event.", "group").WithTags(group.Name);
-            serverConnectedEventTimeHistogram = metricsCollector.Histogram("remote_server_connected_event_time", "The time taken to execute the ServerConnected event.", "group").WithTags(group.Name);
-            serverDisconnectedEventTimeHistogram = metricsCollector.Histogram("remote_server_disconnected_event_time", "The time taken to execute the ServerDisconnected event.", "group").WithTags(group.Name);
-            serverConnectedEventFailuresCounter = metricsCollector.Counter("remote_server_connected_event_failures", "The number of failures executing the ServerConnected event.", "group").WithTags(group.Name);
-            serverDisconnectedEventFailuresCounter = metricsCollector.Counter("remote_server_disconnected_event_failures", "The number of failures executing the ServerDisconnected event.", "group").WithTags(group.Name);
+            // messagesSentCounter = metricsCollector.Counter("messages_sent", "The number of messages sent to remote servers.", "group").WithTags(group.Name);
+            // messagesReceivedCounter = metricsCollector.Counter("messages_received", "The number of messages received from remote servers.", "group").WithTags(group.Name);
+            // messageReceivedEventTimeHistogram = metricsCollector.Histogram("message_received_event_time", "The time taken to execute the MessageReceived event.", "group").WithTags(group.Name);
+            // messageReceivedEventFailuresCounter = metricsCollector.Counter("message_received_event_failures", "The number of failures executing the MessageReceived event.", "group").WithTags(group.Name);
+            // serverConnectedEventTimeHistogram = metricsCollector.Histogram("remote_server_connected_event_time", "The time taken to execute the ServerConnected event.", "group").WithTags(group.Name);
+            // serverDisconnectedEventTimeHistogram = metricsCollector.Histogram("remote_server_disconnected_event_time", "The time taken to execute the ServerDisconnected event.", "group").WithTags(group.Name);
+            // serverConnectedEventFailuresCounter = metricsCollector.Counter("remote_server_connected_event_failures", "The number of failures executing the ServerConnected event.", "group").WithTags(group.Name);
+            // serverDisconnectedEventFailuresCounter = metricsCollector.Counter("remote_server_disconnected_event_failures", "The number of failures executing the ServerDisconnected event.", "group").WithTags(group.Name);
         }
 
         internal void Connect()
@@ -189,14 +188,12 @@ namespace DarkRift.Server
                     }
                     catch (Exception e)
                     {
-                        serverConnectedEventFailuresCounter.Increment();
 
                         // TODO this seems bad, shouldn't we disconenct them?
                         logger.Error("A plugin encountered an error whilst handling the ServerConnected event. The server will still be connected. (See logs for exception)", e);
                     }
 
                     double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                    serverConnectedEventTimeHistogram.Report(time);
                 }
 
                 threadHelper.DispatchIfNeeded(DoServerConnectedEvent);
@@ -212,9 +209,6 @@ namespace DarkRift.Server
         public bool SendMessage(Message message, SendMode sendMode)
         {
             bool success = connection?.SendMessage(message.ToBuffer(), sendMode) ?? false;
-            if (success)
-                messagesSentCounter.Increment();
-
             return success;
         }
 
@@ -235,7 +229,6 @@ namespace DarkRift.Server
         /// <param name="sendMode">The SendMode used to send the data.</param>
         private void MessageReceivedHandler(MessageBuffer buffer, SendMode sendMode)
         {
-            messagesReceivedCounter.Increment();
 
             using (Message message = Message.Create(buffer, true))
             {
@@ -286,7 +279,6 @@ namespace DarkRift.Server
                 }
                 catch (Exception e)
                 {
-                    messageReceivedEventFailuresCounter.Increment();
 
                     logger.Error("A plugin encountered an error whilst handling the MessageReceived event. (See logs for exception)", e);
                 }
@@ -298,7 +290,6 @@ namespace DarkRift.Server
                 }
 
                 double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                messageReceivedEventTimeHistogram.Report(time);
             }
 
             //Inform plugins
@@ -327,13 +318,10 @@ namespace DarkRift.Server
                     }
                     catch (Exception e)
                     {
-                        serverDisconnectedEventFailuresCounter.Increment();
-
                         logger.Error("A plugin encountered an error whilst handling the ServerDisconnected event. (See logs for exception)", e);
                     }
 
                     double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                    serverDisconnectedEventTimeHistogram.Report(time);
                 }
 
                 threadHelper.DispatchIfNeeded(DoServerDisconnectedEvent);

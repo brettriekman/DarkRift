@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Specialized;
 using System.Net;
@@ -31,8 +30,8 @@ namespace DarkRift.Server
         /// </summary>
         public ushort Port { get; set; }
 
-        internal NetworkListenerLoadData(string name, IPAddress address, ushort port, DarkRiftServer server, NameValueCollection settings, Logger logger, MetricsCollector metricsCollector)
-            : base(name, server, settings, logger, metricsCollector)
+        internal NetworkListenerLoadData(string name, IPAddress address, ushort port, DarkRiftServer server, NameValueCollection settings, Logger logger)
+            : base(name, server, settings, logger)
         {
             this.Address = address;
             this.Port = port;

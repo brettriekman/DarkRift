@@ -4,10 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace DarkRift.Server
@@ -64,32 +62,7 @@ namespace DarkRift.Server
         /// </summary>
         private readonly Logger logger;
 
-        /// <summary>
-        ///     Gauge metric of the number of servers currently connected.
-        /// </summary>
-        private readonly IGaugeMetric serversConnectedGauge;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ServerJoined"/> event.
-        /// </summary>
-        private readonly IHistogramMetric serverJoinedEventTimeHistogram;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ServerLeft"/> event.
-        /// </summary>
-        private readonly IHistogramMetric serverLeftEventTimeHistogram;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ServerJoined"/> event.
-        /// </summary>
-        private readonly ICounterMetric serverJoinedEventFailuresCounter;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ServerLeft"/> event.
-        /// </summary>
-        private readonly ICounterMetric serverLeftEventFailuresCounter;
-
-        public ServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, Logger logger, MetricsCollector metricsCollector)
+        public ServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, Logger logger)
         {
             this.Name = name;
             this.Visibility = visibility;
@@ -97,11 +70,6 @@ namespace DarkRift.Server
             this.threadHelper = threadHelper;
             this.logger = logger;
 
-            serversConnectedGauge = metricsCollector.Gauge("remote_servers_connected", "The number of servers connected to the server in this group.", "group").WithTags(name);
-            serverJoinedEventTimeHistogram = metricsCollector.Histogram("remote_server_joined_event_time", "The time taken to execute the ServerJoined event.", "group").WithTags(name);
-            serverLeftEventTimeHistogram = metricsCollector.Histogram("remote_server_left_event_time", "The time taken to execute the ServerLeft event.", "group").WithTags(name);
-            serverJoinedEventFailuresCounter = metricsCollector.Counter("remote_server_joined_event_failures", "The number of failures executing the ServerJoined event.", "group").WithTags(name);
-            serverLeftEventFailuresCounter = metricsCollector.Counter("remote_server_left_event_failures", "The number of failures executing the ServerLeft event.", "group").WithTags(name);
         }
 
         /// <inheritdoc/>
@@ -133,22 +101,15 @@ namespace DarkRift.Server
             {
                 void DoServerJoinEvent()
                 {
-                    long startTimestamp = Stopwatch.GetTimestamp();
-
                     try
                     {
                         handler?.Invoke(this, new ServerJoinedEventArgs(remoteServer, id, this));
                     }
                     catch (Exception e)
                     {
-                        serverJoinedEventFailuresCounter.Increment();
-
                         // TODO this seems bad, shoudln't we disconnect them?
                         logger.Error("A plugin encountered an error whilst handling the ServerJoined event. The server will still be connected. (See logs for exception)", e);
                     }
-
-                    double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                    serverJoinedEventTimeHistogram.Report(time);
                 }
 
                 threadHelper.DispatchIfNeeded(DoServerJoinEvent);
@@ -170,21 +131,15 @@ namespace DarkRift.Server
             {
                 void DoServerLeaveEvent()
                 {
-                    long startTimestamp = Stopwatch.GetTimestamp();
-
                     try
                     {
                         handler?.Invoke(this, new ServerLeftEventArgs(remoteServer, id, this));
                     }
                     catch (Exception e)
                     {
-                        serverLeftEventFailuresCounter.Increment();
-
                         logger.Error("A plugin encountered an error whilst handling the ServerLeft event. (See logs for exception)", e);
                     }
 
-                    double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                    serverLeftEventTimeHistogram.Report(time);
                 }
 
                 threadHelper.DispatchIfNeeded(DoServerLeaveEvent);
@@ -197,14 +152,10 @@ namespace DarkRift.Server
         /// <param name="remoteServer">The server to add.</param>
         protected void AddServer(T remoteServer)
         {
-            int count;
             lock (servers)
             {
                 servers.Add(remoteServer.ID, remoteServer);
-                count = servers.Count;
             }
-
-            serversConnectedGauge.Report(count);
         }
 
         /// <summary>
@@ -214,15 +165,11 @@ namespace DarkRift.Server
         protected T RemoveServer(ushort id)
         {
             T remoteServer;
-            int count;
             lock (servers)
             {
                 remoteServer = servers[id];
                 servers.Remove(id);
-                count = servers.Count;
             }
-
-            serversConnectedGauge.Report(count);
 
             return remoteServer;
         }

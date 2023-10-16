@@ -4,12 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
 
 namespace DarkRift.Server
 {
@@ -18,23 +14,14 @@ namespace DarkRift.Server
     /// </summary>
     public abstract class ExtendedPluginBaseLoadData : PluginBaseLoadData
     {
-        /// <summary>
-        ///     The server's metrics manager.
-        /// </summary>
-        public IMetricsManager MetricsManager { get; set; }
-
-        /// <summary>
-        ///     The metrics collector this plugin will use.
-        /// </summary>
-        public MetricsCollector MetricsCollector { get; set; }
 
         /// <summary>
         ///     The handler for writing events via <see cref="ExtendedPluginBase.WriteEvent(string, LogType, Exception)"/>.
         /// </summary>
         [Obsolete("Use Logger instead. This is kept for plugins using the legacy WriteEvent methods only.")]
         public WriteEventHandler WriteEventHandler { get; set; }
-        
-        internal ExtendedPluginBaseLoadData(string name, DarkRiftServer server, NameValueCollection settings, Logger logger, MetricsCollector metricsCollector
+
+        internal ExtendedPluginBaseLoadData(string name, DarkRiftServer server, NameValueCollection settings, Logger logger
             )
             : base(name, server, settings, logger)
         {
@@ -43,8 +30,6 @@ namespace DarkRift.Server
                 WriteEventHandler = logger.Log;
 #pragma warning restore CS0618
 
-            this.MetricsManager = server.MetricsManager;
-            MetricsCollector = metricsCollector;
         }
 
         /// <summary>

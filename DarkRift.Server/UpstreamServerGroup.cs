@@ -8,8 +8,6 @@ using System;
 using DarkRift.Client;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
-using DarkRift.Server.Metrics;
 
 namespace DarkRift.Server
 {
@@ -48,10 +46,8 @@ namespace DarkRift.Server
         /// </summary>
         private readonly Logger remoteServerLogger;
 
-        /// <summary>
-        /// The metrics collector to pass to created remote servers.
-        /// </summary>
-        private readonly MetricsCollector remoteServerMetricsCollector;
+
+        // private readonly MetricsCollector remoteServerMetricsCollector;
 
         /// <summary>
         ///     Creates a new upstream connected server group
@@ -64,10 +60,8 @@ namespace DarkRift.Server
         /// <param name="reconnectAttempts">The number of times to attempt to reconnect to a server before considering it unconnectable.</param>
         /// <param name="logger">The logger to use.</param>
         /// <param name="remoteServerLogger">The logger to pass to created remote servers.</param>
-        /// <param name="metricsCollector">The metrics collector to use.</param>
-        /// <param name="remoteServerMetricsCollector">The metrics collector to pass to created remote servers.</param>
-        internal UpstreamServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, ServerRegistryConnectorManager serverRegistryConnectorManager, RemoteServerManager remoteServerManager, int reconnectAttempts, Logger logger, Logger remoteServerLogger, MetricsCollector metricsCollector, MetricsCollector remoteServerMetricsCollector)
-            : base(name, visibility, threadHelper, logger, metricsCollector)
+        internal UpstreamServerGroup(string name, ServerVisibility visibility, DarkRiftThreadHelper threadHelper, ServerRegistryConnectorManager serverRegistryConnectorManager, RemoteServerManager remoteServerManager, int reconnectAttempts, Logger logger, Logger remoteServerLogger)
+            : base(name, visibility, threadHelper, logger)
         {
             this.threadHelper = threadHelper;
             this.serverRegistryConnectorManager = serverRegistryConnectorManager;
@@ -75,13 +69,13 @@ namespace DarkRift.Server
             this.reconnectAttempts = reconnectAttempts;
             this.logger = logger;
             this.remoteServerLogger = remoteServerLogger;
-            this.remoteServerMetricsCollector = remoteServerMetricsCollector;
+            // this.remoteServerMetricsCollector = remoteServerMetricsCollector;
         }
 
         /// <inheritdoc />
         public override void HandleServerJoin(ushort id, string host, ushort port, IDictionary<string, string> properties)
         {
-            UpstreamRemoteServer remoteServer = new UpstreamRemoteServer(remoteServerManager, id, host, port, this, threadHelper, remoteServerLogger, remoteServerMetricsCollector);
+            UpstreamRemoteServer remoteServer = new UpstreamRemoteServer(remoteServerManager, id, host, port, this, threadHelper, remoteServerLogger);
 
             AddServer(remoteServer);
 

@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,7 @@ namespace DarkRift.Server
         ///     The group the server is in.
         /// </summary>
         public string Group { get; }
-        
+
         /// <summary>
         ///     The visibility of the server.
         /// </summary>
@@ -74,8 +73,7 @@ namespace DarkRift.Server
         /// <param name="serverRegistryConnectorManager">The server's registry connector manager.</param>
         /// <param name="logManager">The server's log manager.</param>
         /// <param name="logger">The logger to use.</param>
-        /// <param name="metricsManager">The server's metrics manager.</param>
-        internal RemoteServerManager(ServerSpawnData.ServerSettings serverSettings, ServerSpawnData.ServerRegistrySettings serverRegistrySettings, ClusterSpawnData clusterSpawnData, NetworkListenerManager networkListenerManager, DarkRiftThreadHelper threadHelper, ServerRegistryConnectorManager serverRegistryConnectorManager, LogManager logManager, Logger logger, MetricsManager metricsManager)
+        internal RemoteServerManager(ServerSpawnData.ServerSettings serverSettings, ServerSpawnData.ServerRegistrySettings serverRegistrySettings, ClusterSpawnData clusterSpawnData, NetworkListenerManager networkListenerManager, DarkRiftThreadHelper threadHelper, ServerRegistryConnectorManager serverRegistryConnectorManager, LogManager logManager, Logger logger)
         {
             this.AdvertisedHost = serverRegistrySettings.AdvertisedHost;
             this.AdvertisedPort = serverRegistrySettings.AdvertisedPort;
@@ -115,9 +113,9 @@ namespace DarkRift.Server
 
                     IModifiableServerGroup serverGroup;
                     if (ourGroupConnectsTo != null)
-                        serverGroup = new UpstreamServerGroup(groupSettings.Name, groupSettings.Visibility, threadHelper, serverRegistryConnectorManager, this, serverSettings.ReconnectAttempts, logManager.GetLoggerFor(nameof(UpstreamServerGroup)), logManager.GetLoggerFor(nameof(UpstreamRemoteServer)), metricsManager.GetMetricsCollectorFor(nameof(UpstreamServerGroup)), metricsManager.GetMetricsCollectorFor(nameof(UpstreamRemoteServer)));
+                        serverGroup = new UpstreamServerGroup(groupSettings.Name, groupSettings.Visibility, threadHelper, serverRegistryConnectorManager, this, serverSettings.ReconnectAttempts, logManager.GetLoggerFor(nameof(UpstreamServerGroup)), logManager.GetLoggerFor(nameof(UpstreamRemoteServer)));
                     else if (connectsToOurGroup != null)
-                        serverGroup = new DownstreamServerGroup(groupSettings.Name, groupSettings.Visibility, threadHelper, logManager.GetLoggerFor(nameof(DownstreamServerGroup)), logManager.GetLoggerFor(nameof(DownstreamRemoteServer)), metricsManager.GetMetricsCollectorFor(nameof(DownstreamServerGroup)), metricsManager.GetMetricsCollectorFor(nameof(DownstreamRemoteServer)));
+                        serverGroup = new DownstreamServerGroup(groupSettings.Name, groupSettings.Visibility, threadHelper, logManager.GetLoggerFor(nameof(DownstreamServerGroup)), logManager.GetLoggerFor(nameof(DownstreamRemoteServer)));
                     else
                         continue;
 

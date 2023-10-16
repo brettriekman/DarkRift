@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-using DarkRift.Server.Metrics;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -89,11 +88,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
         /// <remarks>This defaults to 65KB.</remarks>
         public override int MaxTcpBodyLength { get; }
 
-        /// <summary>
-        /// Counter for the number of connections attempts that have timed out.
-        /// </summary>
-        private readonly ICounterMetric connectionAttemptTimeoutsCounter;
-
         public BichannelListenerBase(NetworkListenerLoadData listenerLoadData)
             : base(listenerLoadData)
         {
@@ -138,7 +132,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                 // Not on Windows, no need to worry about the option
             }
 
-            connectionAttemptTimeoutsCounter = MetricsCollector.Counter("connection_attempt_timeouts", "The number of connection attempts made to this listener that timed out.");
         }
 
         /// <summary>
@@ -228,7 +221,6 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
             if (remoteEndPoint != null)
                 Logger.Trace("Connection attempt from " + remoteEndPoint + " timed out.");
 
-            connectionAttemptTimeoutsCounter.Increment();
         }
 
         /// <summary>
@@ -307,8 +299,7 @@ namespace DarkRift.Server.Plugins.Listeners.Bichannel
                     tcpSocket,
                     this,
                     (IPEndPoint)remoteEndPoint,
-                    token,
-                    MetricsManager.GetPerMessageMetricsCollectorFor(Name)
+                    token
                 );
 
                 // Send message back to client to say hi

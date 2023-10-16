@@ -7,14 +7,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using DarkRift.Server.Plugins.Listeners.Bichannel;
 using DarkRift.Dispatching;
-using System.Diagnostics;
-using DarkRift.Server.Metrics;
-using System.Xml.Schema;
 
 namespace DarkRift.Server
 {
@@ -34,7 +30,7 @@ namespace DarkRift.Server
         /// </summary>
         [Obsolete("Use listener system instead. This will currently read the port of a BichannelListener called 'DefaultNetworkListener'.")]
         public ushort Port => GetDefaultBichannelListenerOrError().Port;
-            
+
         /// <summary>
         ///     The IP version that the server is listening on.
         /// </summary>
@@ -61,7 +57,7 @@ namespace DarkRift.Server
         ///     Invoked when a client disconnects from the server.
         /// </summary>
         public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
-        
+
         /// <summary>
         ///     Returns the number of clients currently connected.
         /// </summary>
@@ -130,36 +126,6 @@ namespace DarkRift.Server
         private readonly Logger clientLogger;
 
         /// <summary>
-        ///     Gauge metric of the number of clients currently connected.
-        /// </summary>
-        private readonly IGaugeMetric clientsConnectedGauge;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ClientConnected"/> event.
-        /// </summary>
-        private readonly IHistogramMetric clientConnectedEventTimeHistogram;
-
-        /// <summary>
-        ///     Histogram metric of time taken to execute the <see cref="ClientDisconnected"/> event.
-        /// </summary>
-        private readonly IHistogramMetric clientDisconnectedEventTimeHistogram;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ClientConnected"/> event.
-        /// </summary>
-        private readonly ICounterMetric clientConnectedEventFailuresCounter;
-
-        /// <summary>
-        ///     Counter metric of failures executing the <see cref="ClientDisconnected"/> event.
-        /// </summary>
-        private readonly ICounterMetric clientDisconnectedEventFailuresCounter;
-
-        /// <summary>
-        ///     Metrics collector used by the clients.
-        /// </summary>
-        private readonly MetricsCollector clientMetricsCollector;
-
-        /// <summary>
         ///     Creates a new client manager.
         /// </summary>
         /// <param name="settings">The settings for this client manager.</param>
@@ -167,22 +133,13 @@ namespace DarkRift.Server
         /// <param name="threadHelper">The thread helper the client manager will use.</param>
         /// <param name="logger">The logger this client manager will use.</param>
         /// <param name="clientLogger">The logger clients will use.</param>
-        /// <param name="metricsCollector">The metrics collector to use.</param>
-        /// <param name="clientMetricsCollector">The metrics collector clients will use.</param>
-        internal ClientManager(ServerSpawnData.ServerSettings settings, NetworkListenerManager networkListenerManager, DarkRiftThreadHelper threadHelper, Logger logger, Logger clientLogger, MetricsCollector metricsCollector, MetricsCollector clientMetricsCollector)
+        internal ClientManager(ServerSpawnData.ServerSettings settings, NetworkListenerManager networkListenerManager, DarkRiftThreadHelper threadHelper, Logger logger, Logger clientLogger)
         {
             this.MaxStrikes = settings.MaxStrikes;
             this.networkListenerManager = networkListenerManager;
             this.threadHelper = threadHelper;
             this.logger = logger;
             this.clientLogger = clientLogger;
-            this.clientMetricsCollector = clientMetricsCollector;
-
-            clientsConnectedGauge = metricsCollector.Gauge("clients_connected", "The number of clients connected to the server.");
-            clientConnectedEventTimeHistogram = metricsCollector.Histogram("client_connected_event_time", "The time taken to execute the ClientConnected event.");
-            clientDisconnectedEventTimeHistogram = metricsCollector.Histogram("client_disconnected_event_time", "The time taken to execute the ClientDisconnected event.");
-            clientConnectedEventFailuresCounter = metricsCollector.Counter("client_connected_event_failures", "The number of failures executing the ClientConnected event.");
-            clientDisconnectedEventFailuresCounter = metricsCollector.Counter("client_disconnected_event_failures", "The number of failures executing the ClientDisconnected event.");
         }
 
         /// <summary>
@@ -244,8 +201,7 @@ namespace DarkRift.Server
                     id,
                     this,
                     threadHelper,
-                    clientLogger,
-                    clientMetricsCollector
+                    clientLogger
                 );
             }
             catch (Exception e)
@@ -265,8 +221,6 @@ namespace DarkRift.Server
 
             logger.Info($"New client [{client.ID}] connected [{client.RemoteEndPoints.Format()}].");
 
-            clientsConnectedGauge.Report(noClients);
-
             //Inform plugins of the new connection
             EventHandler<ClientConnectedEventArgs> handler = ClientConnected;
             if (handler != null)
@@ -274,7 +228,6 @@ namespace DarkRift.Server
                 threadHelper.DispatchIfNeeded(
                     delegate ()
                     {
-                        long startTimestamp = Stopwatch.GetTimestamp();
                         try
                         {
                             handler.Invoke(this, new ClientConnectedEventArgs(client));
@@ -282,16 +235,9 @@ namespace DarkRift.Server
                         catch (Exception e)
                         {
                             logger.Error("A plugin encountered an error whilst handling the ClientConnected event. The client will be disconnected. (See logs for exception)", e);
-
                             client.DropConnection();
-
-                            clientConnectedEventFailuresCounter.Increment();
-
-                            return;
                         }
 
-                        double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                        clientConnectedEventTimeHistogram.Report(time);
                     },
                     (_) => client.StartListening()
                 );
@@ -400,7 +346,6 @@ namespace DarkRift.Server
                 threadHelper.DispatchIfNeeded(
                     delegate ()
                     {
-                        long startTimestamp = Stopwatch.GetTimestamp();
                         try
                         {
                             handler.Invoke(this, new ClientDisconnectedEventArgs(client, localDisconnect, error, exception));
@@ -408,14 +353,8 @@ namespace DarkRift.Server
                         catch (Exception e)
                         {
                             logger.Error("A plugin encountered an error whilst handling the ClientDisconnected event. (See logs for exception)", e);
-
-                            clientDisconnectedEventFailuresCounter.Increment();
-
-                            return;
                         }
 
-                        double time = (double)(Stopwatch.GetTimestamp() - startTimestamp) / Stopwatch.Frequency;
-                        clientDisconnectedEventTimeHistogram.Report(time);
                     },
                     delegate (ActionDispatcherTask t)
                     {
@@ -450,7 +389,6 @@ namespace DarkRift.Server
 
             client.Dispose();
 
-            clientsConnectedGauge.Report(noClients);
         }
 
         /// <summary>
@@ -461,7 +399,6 @@ namespace DarkRift.Server
         {
             DeallocateID(client.ID, out int noClients);
 
-            clientsConnectedGauge.Report(noClients);
         }
 
         // TODO calling the methods below rapidly can block new connections being accepted as the lock on clients cant be aquired
