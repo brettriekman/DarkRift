@@ -97,11 +97,6 @@ namespace DarkRift.Server
         internal ClientManager InternalClientManager { get; }
 
         /// <summary>
-        ///     The handler for all commands issued from the user.
-        /// </summary>
-        internal CommandEngine CommandEngine { get; }
-
-        /// <summary>
         ///     The manager for server data.
         /// </summary>
         internal DataManager DataManager { get; }
@@ -287,8 +282,6 @@ namespace DarkRift.Server
 #pragma warning restore
             }
 
-            CommandEngine = new CommandEngine(ThreadHelper, InternalPluginManager, logManager.GetLoggerFor(nameof(CommandEngine)));
-
             //Inform plugins we have loaded
             Loaded = true;
             InternalPluginManager.Loaded();
@@ -359,15 +352,6 @@ namespace DarkRift.Server
         public void ExecuteDispatcherTasks()
         {
             dispatcher.ExecuteDispatcherTasks();
-        }
-
-        /// <summary>
-        ///     Executes a given command on the server.
-        /// </summary>
-        /// <param name="command">The command to execute.</param>
-        public void ExecuteCommand(string command)
-        {
-            CommandEngine.HandleCommand(command);
         }
 
         /// <summary>

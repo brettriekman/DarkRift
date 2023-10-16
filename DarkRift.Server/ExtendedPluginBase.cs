@@ -24,15 +24,6 @@ namespace DarkRift.Server
         public abstract bool ThreadSafe { get; }
 
         /// <summary>
-        ///     The commands the plugin has.
-        /// </summary>
-        /// <remarks>
-        ///     This is an array of commands that can be executed by this plugin and will be searched through when the
-        ///     command is executed. Changes to this array will be reflected instantly by the command system.
-        /// </remarks>
-        public virtual Command[] Commands => new Command[0];
-
-        /// <summary>
         ///     The handler for writing events.
         /// </summary>
         private readonly WriteEventHandler writeEventHandler;

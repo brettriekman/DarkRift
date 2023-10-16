@@ -32,43 +32,15 @@ namespace DarkRift.Server.Console
         /// <param name="args"></param>
         private static void Main(string[] args)
         {
-            string[] rawArguments = CommandEngine.ParseArguments(string.Join(" ", args));
-            string[] arguments = CommandEngine.GetArguments(rawArguments);
-            NameValueCollection variables = CommandEngine.GetFlags(rawArguments);
 
-            foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
-                variables.Add((string)environmentVariable.Key, (string)environmentVariable.Value);
-
-            string serverConfigFile;
-            string clusterConfigFile;
-            if (arguments.Length < 1)
-            {
-                serverConfigFile = "Server.config";
-                clusterConfigFile = "Cluster.config";
-            }
-            else if (arguments.Length == 1)
-            {
-                serverConfigFile = arguments[0];
-                clusterConfigFile = "Cluster.config";
-            }
-            else if (arguments.Length == 2)
-            {
-                serverConfigFile = arguments[0];
-                clusterConfigFile = arguments[1];
-            }
-            else
-            {
-                System.Console.Error.WriteLine("Unexpected number of comand line arguments passed. Expected 0-2 but found " + arguments.Length + ".");
-                System.Console.WriteLine("Press any key to exit...");
-                System.Console.ReadKey();
-                return;
-            }
+            string serverConfigFile = "Server.config";
+            string clusterConfigFile = "Cluster.config";
 
             DarkRiftServerConfigurationBuilder serverConfigurationBuilder;
 
             try
             {
-                serverConfigurationBuilder = DarkRiftServerConfigurationBuilder.CreateFromXml(serverConfigFile, variables);
+                serverConfigurationBuilder = DarkRiftServerConfigurationBuilder.CreateFromXml(serverConfigFile);
             }
             catch (IOException e)
             {
@@ -98,7 +70,7 @@ namespace DarkRift.Server.Console
                 DarkRiftClusterConfigurationBuilder clusterConfigurationBuilder;
                 try
                 {
-                    clusterConfigurationBuilder = DarkRiftClusterConfigurationBuilder.CreateFromXml(clusterConfigFile, variables);
+                    clusterConfigurationBuilder = DarkRiftClusterConfigurationBuilder.CreateFromXml(clusterConfigFile);
                 }
                 catch (IOException e)
                 {
@@ -154,7 +126,6 @@ namespace DarkRift.Server.Console
                     return;
                 }
 
-                server.ExecuteCommand(input);
             }
         }
     }
